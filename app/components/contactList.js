@@ -1,22 +1,19 @@
-export default function ContactList({ setActiveUser }) {
+import { ContactCard } from "./contactCard";
+
+export default function ContactList({ activeUser, setActiveUser, usersList }) {
   return (
-    <section>
+    <section className="p-8">
       <h2>Contact List</h2>
-      <div id="contact-card" onClick={() => setActiveUser("Luis")}>
-        <h2>Luis</h2>
-        <p>+57 3005545201</p>
-      </div>
-      <div id="contact-card" onClick={() => setActiveUser("Sebas")}>
-        <h2>Sebas</h2>
-        <p>+57 3005545201</p>
-      </div>
-      <div id="contact-card" onClick={() => setActiveUser("Ale")}>
-        <h2>Ale</h2>
-        <p>+57 3005545201</p>
-      </div>
-      <div id="contact-card" onClick={() => setActiveUser("Gabriel")}>
-        <h2>Gabriel</h2>
-        <p>+57 3005545201</p>
+      <div className="flex flex-col gap-4">
+        {usersList &&
+          usersList.map((user, index) => (
+            <ContactCard
+              key={index}
+              user={user}
+              activeUser={activeUser}
+              setActiveUser={setActiveUser}
+            />
+          ))}
       </div>
     </section>
   );
