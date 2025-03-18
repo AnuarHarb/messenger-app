@@ -10,6 +10,15 @@ export default function Chat({ activeUser }) {
       author: author,
     };
     setMessages((prev) => [...prev, newMessage]);
+    setInputValue("");
+  };
+
+  const setMessageBackground = (message) => {
+    if (message.author === "me") {
+      return "justify-end";
+    } else {
+      return "justify-start";
+    }
   };
 
   return (
@@ -21,13 +30,16 @@ export default function Chat({ activeUser }) {
         </h2>
       </header>
       <section className="border-amber-600 border-2 w-full h-full gap-4">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            className={`flex ${
-              message.author === "me" ? "justify-end" : "justify-start"
-            } my-5`}
+            key={index}
+            className={`flex ${setMessageBackground(message)} my-5`}
           >
-            <div className="bg-blue-300 p-2 rounded-4xl w-[50%]">
+            <div
+              className={`${
+                message.author === "me" ? "bg-blue-300" : "bg-blue-800"
+              }  p-2 rounded-4xl w-[50%]`}
+            >
               {message.text}
             </div>
           </div>
@@ -37,6 +49,7 @@ export default function Chat({ activeUser }) {
         <input
           className="bg-white w-full text-black"
           type="text"
+          value={inputValue}
           onChange={(event) => setInputValue(event.target.value)}
         ></input>
         <button

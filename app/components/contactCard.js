@@ -7,11 +7,11 @@ export const ContactCard = ({ user, activeUser, setActiveUser }) => {
       onClick={() => setActiveUser(user)}
     >
       <div className="rounded-lg overflow-hidden">
-        <img className="w-full" src={user.picture.thumbnail}></img>
+        <img className="w-full" src={user.image}></img>
       </div>
       <div>
-        <h3>{user.name.first}</h3>
-        <p>{user.location.city}</p>
+        <h3>{user.name}</h3>
+        <p>{user.lastName}</p>
         <p>{user.phone}</p>
       </div>
     </article>

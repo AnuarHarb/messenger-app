@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Header from "./components/header";
 import ContactList from "./components/contactList";
 import Chat from "./components/chat";
+import { db } from "@/firebaseConfig";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function Home() {
   const [activeUser, setActiveUser] = useState("");
@@ -11,9 +13,15 @@ export default function Home() {
 
   useEffect(() => {
     const getUsers = async () => {
-      const response = await fetch("https://randomuser.me/api/?results=5"); // GET - POST - PUT - DELETE
-      const resp = await response.json();
-      setUsersList(resp.results);
+      // const response = await fetch("https://randomuser.me/api/?results=5"); // GET - POST - PUT - DELETE
+      // const resp = await response.json();
+      // setUsersList(resp.results);
+
+      const usersCollection = collection(db, "users");
+      const usersSnapshot = await getDocs(usersCollection);
+      const users = usersSnapshot.docs.map((user) => user.data());
+      setUsersList(users);
+      console.log(users);
     };
     getUsers();
   }, []);
