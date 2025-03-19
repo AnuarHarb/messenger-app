@@ -21,13 +21,12 @@ export default function Home() {
       const usersSnapshot = await getDocs(usersCollection);
       const users = usersSnapshot.docs.map((user) => user.data());
       setUsersList(users);
-      console.log(users);
     };
     getUsers();
   }, []);
 
   return (
-    <section className="h-[100vh]">
+    <section className="h-[100vh] bg-linear-to-bl from-sky-400 to-purple-950">
       <Header />
       <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 4fr" }}>
         <ContactList
