@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Chat({ activeUser }) {
   const [inputValue, setInputValue] = useState("");
@@ -23,11 +24,23 @@ export default function Chat({ activeUser }) {
 
   return (
     <section>
-      <header className="flex px-8 py-4 bg-amber-800 items-center text-3xl">
+      <header className="flex px-8 py-4 bg-amber-800 items-center text-3xl justify-between">
         <h2>
           Chat -{" "}
-          {activeUser ? activeUser.name.first : "Elige un usuario para chatear"}
+          {activeUser ? activeUser.name : "Elige un usuario para chatear"}
         </h2>
+        {/* <Link
+          href={`/perfil?userName=${activeUser.name}`}
+          className="bg-slate-200 text-sm text-black p-4 cursor-pointer hover:bg-stone-400 active:translate-y-0.5"
+        >
+          Ver perfil
+        </Link> */}
+        <Link
+          href={`/perfil/${activeUser.id}`}
+          className="bg-slate-200 text-sm text-black p-4 cursor-pointer hover:bg-stone-400 active:translate-y-0.5"
+        >
+          Ver perfil
+        </Link>
       </header>
       <section className="border-amber-600 border-2 w-full h-full gap-4">
         {messages.map((message, index) => (

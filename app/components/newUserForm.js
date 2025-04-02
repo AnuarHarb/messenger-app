@@ -1,30 +1,52 @@
 import { useState } from "react";
-import { db } from "@/firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { db, storage } from "@/firebaseConfig";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes } from "firebase/storage";
 
 export const NewUserForm = ({ setModal }) => {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
-  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState();
 
   const clickHandler = async () => {
-    const savedUser = await addDoc(collection(db, "users"), {
+    const imagePath = await uploadImage(imageFile);
+    const userRef = doc(collection(db, "users"));
+    await setDoc(userRef, {
+      id: userRef.id,
       name: name,
       lastName: lastName,
       phone: phone,
-      image: image,
+      image: imagePath || "Parrilla Barranqui.IA.jpg",
     });
 
     setModal(false);
   };
 
+  const closeHandler = (event) => {
+    if (event.target.id === "modal") {
+      setModal(false);
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const storageRef = ref(storage, `user-images/${file.name}`);
+    const response = await uploadBytes(storageRef, file, {
+      contentType: file.type,
+    });
+    return response.metadata.fullPath;
+  };
+
   return (
     <section
       id="modal"
+      onClick={(event) => closeHandler(event)}
       className="absolute w-full h-full bg-black/50 top-0 left-0 flex justify-center items-center"
     >
-      <article className="bg-gray-100 text-black p-6 h-100 w-100 flex flex-col gap-2">
+      <article
+        id="modal-card"
+        className="bg-gray-100 text-black p-6 h-100 w-100 flex flex-col gap-2"
+      >
         <h2 className="text-xl bold">Agregar contacto</h2>
         <div>
           <label>Nombre:</label>
@@ -54,12 +76,11 @@ export const NewUserForm = ({ setModal }) => {
           ></input>
         </div>
         <div>
-          <label>Url de Imagen:</label>
+          <label>Imagen:</label>
           <input
-            type="text"
+            type="file"
             className="border-amber-950 border-2"
-            onChange={(event) => setImage(event.target.value)}
-            value={image}
+            onChange={(event) => setImageFile(event.target.files[0])}
           ></input>
         </div>
         <button
