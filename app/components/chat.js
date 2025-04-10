@@ -1,21 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { db } from "@/firebaseConfig";
+import { GoogleGenAI } from "@google/genai"; // npm i @google/genai
+import { collection, query, getDocs, where, setDoc } from "firebase/firestore";
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+});
 
 export default function Chat({ activeUser }) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
 
-  const submitMessage = (author) => {
+  const chat = ai.chats.create({
+    model: "gemini-2.0-flash",
+    history: [
+      {
+        role: "user",
+        parts: [{ text: "Hello" }],
+      },
+      {
+        role: "model",
+        parts: [{ text: "Great to meet you. What would you like to know?" }],
+      },
+    ],
+    config: {
+      systemInstruction: `Eres una persona con la que estoy chateando y te llamas ${activeUser.name} ${activeUser.lastName} y ${activeUser.description}`,
+      temperature: 0.1,
+    },
+  });
+
+  useEffect(() => {
+    setMessages([]);
+  }, [activeUser]);
+
+  const submitMessage = async (senderId) => {
     const newMessage = {
       text: inputValue,
-      author: author,
+      senderId: senderId,
     };
+
     setMessages((prev) => [...prev, newMessage]);
+
+    await askGemini(inputValue);
     setInputValue("");
   };
 
+  const askGemini = async (inputValue) => {
+    const response = await chat.sendMessage({
+      message: inputValue,
+    });
+
+    console.log("responsae", response.text);
+
+    const newMessage = {
+      text: response.text,
+      senderId: activeUser.id,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+  };
+
   const setMessageBackground = (message) => {
-    if (message.author === "me") {
+    if (message.senderId === "me") {
       return "justify-end";
     } else {
       return "justify-start";
@@ -50,7 +97,7 @@ export default function Chat({ activeUser }) {
           >
             <div
               className={`${
-                message.author === "me" ? "bg-blue-300" : "bg-blue-800"
+                message.senderId === "me" ? "bg-blue-300" : "bg-blue-800"
               }  p-2 rounded-4xl w-[50%]`}
             >
               {message.text}
@@ -73,7 +120,7 @@ export default function Chat({ activeUser }) {
         </button>
         <button
           className="bg-blue-300 p-8 rounded-md"
-          onClick={() => submitMessage("you")}
+          onClick={() => submitMessage(activeUser.id)}
         >
           Enviar (como tú)
         </button>
